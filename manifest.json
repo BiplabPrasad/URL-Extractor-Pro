@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "URL Extractor Pro",
+    "version": "1.1.2",
+    "description": "Extracts URLs from HTML using custom regex, manages regex patterns, and keeps a history.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "tabs"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        },
+        "default_title": "Extract URLs from HTML"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    }
+}

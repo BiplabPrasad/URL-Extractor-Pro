@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Extractor Pro</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="tab-nav">
+        <button class="tab-button active" data-tab="extractTab">Extract</button>
+        <button class="tab-button" data-tab="regexTab">Manage Regex</button>
+        <button class="tab-button" data-tab="historyTab">History</button>
+      </nav>
+
+      <!-- Extract Tab Content -->
+      <div id="extractTab" class="tab-content active">
+        <h1>Extract URLs</h1>
+        <p class="description">
+          Finds URLs matching your saved regex patterns.
+        </p>
+        <button id="extractBtn">Extract URLs from Current Tab</button>
+        <div id="extractLoading" class="status" style="display: none">
+          Loading HTML and extracting...
+        </div>
+        <div id="extractResults" class="results">
+          <!-- Grouped URLs and buttons will be dynamically added here -->
+        </div>
+        <div id="extractStatus" class="status"></div>
+      </div>
+
+      <!-- Manage Regex Tab Content -->
+      <div id="regexTab" class="tab-content">
+        <h1>Manage Regex</h1>
+        <form id="regexForm">
+          <input type="hidden" id="regexEditId" />
+          <!-- For editing -->
+          <div class="form-group">
+            <label for="regexName">Name:</label>
+            <input
+              type="text"
+              id="regexName"
+              placeholder="e.g., CodeDeploy URLs"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="regexValue">Regex Value:</label>
+            <input
+              type="text"
+              id="regexValue"
+              placeholder="e.g., https://console\.aws\..."
+              required
+            />
+            <small
+              >Enter the regex pattern string (no leading/trailing slashes). Use
+              `\\` for backslashes.</small
+            >
+          </div>
+          <button type="submit" id="saveRegexBtn">Add Regex</button>
+        </form>
+        <hr />
+        <h2>Saved Regex Patterns</h2>
+        <ul id="regexList" class="item-list">
+          <!-- Regex patterns will be listed here -->
+        </ul>
+        <div id="regexStatus" class="status"></div>
+      </div>
+
+      <!-- History Tab Content -->
+      <div id="historyTab" class="tab-content">
+        <h1>Extraction History</h1>
+        <div class="history-controls">
+          <input type="text" id="historySearch" placeholder="Search URLs..." />
+          <select id="historySort">
+            <option value="newest">Sort: Newest First</option>
+            <option value="oldest">Sort: Oldest First</option>
+          </select>
+          <button id="clearHistoryBtn">Clear History</button>
+        </div>
+        <ul id="historyList" class="item-list history-list">
+          <!-- History items will be listed here -->
+        </ul>
+        <div id="historyStatus" class="status"></div>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
