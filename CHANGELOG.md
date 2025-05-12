@@ -5,15 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2025-05-12
 
 ### Added
+- New icon buttons in URL list items for improved user interaction
+- Copy to clipboard functionality for extracted URLs
+- Visual feedback when URLs are copied (checkmark icon and temporary highlighting)
+- Improved action buttons layout with consistent styling across the extension
+- Better visual distinction between URL text and action buttons
 
-- Placeholder for next feature.
+### Changed
+- Redesigned URL list items to use icon-based buttons instead of text buttons
+- Updated styling for action buttons to use a more compact, icon-based design
+- Improved spacing and alignment in URL list items
+- Enhanced visual feedback for user interactions (button hover states, copy confirmation)
+- Standardized button appearance across different tabs for better consistency
 
 ### Fixed
-
-- Placeholder for next bug fix.
+- Improved word breaking for long URLs to prevent layout issues
+- Better handling of URL text overflow with proper truncation and tooltips
+- Consistent styling between extract results and history items
 
 ## [1.1.2] - 2025-04-12
 

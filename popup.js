@@ -7,6 +7,27 @@ document.addEventListener("DOMContentLoaded", () => {
   let regexList = []; // In-memory list of regex objects { id, name, value }
   let historyList = []; // In-memory list of history objects { id, url, timestamp, regexName? }
 
+  // Default regex patterns to add when no patterns exist
+  const defaultRegexPatterns = [
+    {
+      id: Date.now(),
+      name: "All HTTP/HTTPS URLs (demo)",
+      value: "https?:\\/\\/[\\w\\.-]+\\.[a-zA-Z]{2,}(\\/[\\w\\.-]*)*",
+    },
+    {
+      id: Date.now() + 1,
+      name: "Image URLs (demo)",
+      value:
+        "https?:\\/\\/[\\w\\.-]+\\.[a-zA-Z]{2,}(\\/[\\w\\.-]*)*\\.(jpg|jpeg|png|gif|webp)",
+    },
+    {
+      id: Date.now() + 2,
+      name: "AWS CodeDeploy URLs (demo)",
+      value:
+        "https:\\/\\/console\\.aws\\.amazon\\.com\\/codedeploy\\/home\\?region=[a-zA-Z0-9-]+#\\/deployments\\/d-[A-Z0-9]+",
+    },
+  ];
+
   // --- DOM Elements ---
   const tabButtons = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab-content");
@@ -91,6 +112,36 @@ document.addEventListener("DOMContentLoaded", () => {
       showStatus(
         document.querySelector(".tab-content.active .status"),
         `Error loading data: ${error.message}`,
+        "error"
+      );
+      return [];
+    }
+  };
+
+  // Function to load regex patterns from storage with default fallback
+  const loadRegexPatterns = async () => {
+    try {
+      const result = await chrome.storage.local.get(storageKeys.regex);
+      if (
+        result[storageKeys.regex] &&
+        Array.isArray(result[storageKeys.regex]) &&
+        result[storageKeys.regex].length > 0
+      ) {
+        regexList = result[storageKeys.regex];
+      } else {
+        // Initialize with default patterns if no patterns exist
+        regexList = defaultRegexPatterns;
+        // Save default patterns to storage
+        await chrome.storage.local.set({ [storageKeys.regex]: regexList });
+        console.log("Default regex patterns initialized");
+      }
+      renderRegexList();
+      return regexList;
+    } catch (error) {
+      console.error(`Error loading regex patterns:`, error);
+      showStatus(
+        document.querySelector(".tab-content.active .status"),
+        `Error loading regex patterns: ${error.message}`,
         "error"
       );
       return [];
@@ -300,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const clearHistory = () => {
-    if (confirm("Are you sure you want to clear your browsing history?")) {
+    if (confirm("Are you sure you want to clear your extraction history?")) {
       historyList = []; // Clear the in-memory list
       saveData(storageKeys.history, historyList); // Update storage
       renderHistory(); // Re-render the history list
@@ -310,14 +361,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- URL Extraction ---
   const openUrlInBackground = (url) => {
-    chrome.tabs.create({ url: url, active: false }).catch((error) => {
-      console.error(`Error opening tab for ${url}:`, error);
-      showStatus(
-        extractStatusDiv,
-        `Error opening tab: ${error.message}`,
-        "error"
-      );
-    });
+    // First get the current tab's index
+    chrome.tabs
+      .query({ active: true, currentWindow: true })
+      .then((tabs) => {
+        if (tabs.length === 0) throw new Error("Could not find active tab.");
+
+        // Create new tab at current index + 1 (right next to current tab)
+        return chrome.tabs.create({
+          url: url,
+          active: false,
+          index: tabs[0].index + 1, // This places the new tab right after the current one
+        });
+      })
+      .catch((error) => {
+        console.error(`Error opening tab for ${url}:`, error);
+        showStatus(
+          extractStatusDiv,
+          `Error opening tab: ${error.message}`,
+          "error"
+        );
+      });
   };
 
   const displayGroupedUrls = (groupedUrls) => {
@@ -335,13 +399,57 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalUrls = 0;
     groupNames.forEach((groupName) => {
       const urls = groupedUrls[groupName];
-      if (urls.length > 0) {
+      if (urls && urls.length > 0) {
         totalUrls += urls.length;
+
+        // Create a container div for the entire group section
+        const groupContainer = document.createElement("div");
+        groupContainer.className = "url-group-container";
+
+        // Create a container div for the header section
+        const headerContainer = document.createElement("div");
+        headerContainer.className = "group-header-container";
+
+        // Create the group header
         const groupHeader = document.createElement("h2");
         groupHeader.textContent = escapeHtml(groupName); // Display Regex Name
-        extractResultsDiv.appendChild(groupHeader);
+        groupHeader.className = "group-header";
 
+        // Add "Open All" button for this group
+        const openAllButton = document.createElement("button");
+        openAllButton.textContent = `Open All (${urls.length})`;
+        openAllButton.className = "open-all-btn small-btn";
+        openAllButton.addEventListener("click", () => {
+          // Open all URLs in this group
+          urls.forEach((url) => {
+            openUrlInBackground(url);
+          });
+          showStatus(
+            extractStatusDiv,
+            `Opening ${urls.length} URLs from "${escapeHtml(
+              groupName
+            )}" group.`,
+            "success"
+          );
+        });
+
+        // Add header elements to the header container
+        headerContainer.appendChild(groupHeader);
+        headerContainer.appendChild(openAllButton);
+
+        // Add the header container to the group container
+        groupContainer.appendChild(headerContainer);
+
+        // Add a horizontal rule for the underline
+        const hr = document.createElement("hr");
+        hr.className = "header-underline";
+        groupContainer.appendChild(hr);
+
+        // Create the URL list for this group
         const ul = document.createElement("ul");
+        ul.className = "url-list";
+
+        // Add each URL to the list
         urls.forEach((url) => {
           const li = document.createElement("li");
 
@@ -353,22 +461,78 @@ document.addEventListener("DOMContentLoaded", () => {
               : escapeHtml(url);
           urlSpan.title = url;
 
-          const openButton = document.createElement("button");
-          openButton.textContent = "Open";
-          openButton.className = "open-url-btn";
-          openButton.dataset.url = url;
+          // Create action buttons container
+          const actionButtons = document.createElement("div");
+          actionButtons.className = "action-buttons";
 
+          // Create open button with icon
+          const openButton = document.createElement("button");
+          openButton.innerHTML = '<i class="icon-open">↗</i>'; // Simple external link arrow
+          openButton.title = "Open URL in new tab";
+          openButton.className = "icon-btn open-url-btn";
+          openButton.dataset.url = url;
           openButton.addEventListener("click", (event) => {
-            openUrlInBackground(event.target.dataset.url);
+            openUrlInBackground(
+              event.target.closest(".open-url-btn").dataset.url
+            );
           });
 
+          // Create copy button with icon
+          const copyButton = document.createElement("button");
+          copyButton.innerHTML = '<i class="icon-copy">⎘</i>'; // Simple copy symbol
+          copyButton.title = "Copy URL to clipboard";
+          copyButton.className = "icon-btn copy-url-btn";
+          copyButton.dataset.url = url;
+          copyButton.addEventListener("click", (event) => {
+            const urlToCopy = event.target.closest(".copy-url-btn").dataset.url;
+            navigator.clipboard
+              .writeText(urlToCopy)
+              .then(() => {
+                // Show temporary success indicator
+                const originalIcon = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="icon-check">✓</i>'; // Simple checkmark
+                copyButton.classList.add("copied");
+                setTimeout(() => {
+                  copyButton.innerHTML = originalIcon;
+                  copyButton.classList.remove("copied");
+                }, 1500);
+
+                showStatus(
+                  extractStatusDiv,
+                  "URL copied to clipboard",
+                  "success",
+                  1500
+                );
+              })
+              .catch((err) => {
+                console.error("Could not copy text: ", err);
+                showStatus(
+                  extractStatusDiv,
+                  "Failed to copy URL",
+                  "error",
+                  1500
+                );
+              });
+          });
+
+          // Add buttons to action container
+          actionButtons.appendChild(openButton);
+          actionButtons.appendChild(copyButton);
+
+          // Add elements to list item
           li.appendChild(urlSpan);
-          li.appendChild(openButton);
+          li.appendChild(actionButtons);
           ul.appendChild(li);
         });
-        extractResultsDiv.appendChild(ul);
+
+        // Add the URL list to the group container
+        groupContainer.appendChild(ul);
+
+        // Add the complete group container to the results div
+        extractResultsDiv.appendChild(groupContainer);
       }
     });
+
     if (totalUrls > 0) {
       showStatus(
         extractStatusDiv,
@@ -477,7 +641,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Initialization ---
   const initialize = async () => {
     // Load data
-    regexList = await loadData(storageKeys.regex);
+    loadRegexPatterns();
     historyList = await loadData(storageKeys.history);
 
     // Setup Regex Tab
@@ -504,11 +668,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const escapeHtml = (unsafe) => {
     if (typeof unsafe !== "string") return unsafe;
     return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, """)
+      .replace(/'/g, "'");
   };
 
   initialize(); // Start the extension logic

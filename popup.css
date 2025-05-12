@@ -162,6 +162,57 @@ small {
   background-color: #218838;
 }
 
+.url-group-container {
+  margin-bottom: 20px;
+}
+
+.group-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.group-header {
+  margin: 0;
+  font-size: 16px;
+  border-bottom: 0px;
+}
+
+.small-btn {
+  font-size: 12px;
+  padding: 3px 8px;
+  height: auto;
+  min-height: 24px;
+}
+
+.header-underline {
+  margin-top: 0;
+  margin-bottom: 10px;
+  border: none;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.url-list {
+  margin-top: 0;
+}
+
+.open-all-btn {
+  margin: 5px 0 5px 0;
+  padding: 5px 10px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.open-all-btn:hover {
+  background-color: #3367d6;
+}
+
 /* Regex Tab Specific */
 #regexForm {
   margin-bottom: 15px;
@@ -351,4 +402,71 @@ small {
   /* Timestamp */
   font-size: 0.8em;
   color: #adb5bd;
+}
+
+/* Icon button styles */
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: #e8e8e8;
+  border-color: #ccc;
+}
+
+.icon-btn:active {
+  background-color: #dcdcdc;
+}
+
+/* Ensure all icon styles are identical */
+.icon-open,
+.icon-copy,
+.icon-check {
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* Remove any potential specific styling for open-url-btn or copy-url-btn */
+.open-url-btn,
+.copy-url-btn {
+  /* Reset any specific styles that might be different */
+}
+
+.copied {
+  background-color: #e8f4e8;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+/* Adjust list items to accommodate the new buttons */
+.url-list li,
+#historyList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.url-text {
+  flex: 1;
+  margin-right: 10px;
+  word-break: break-all;
+  font-size: 13px;
 }

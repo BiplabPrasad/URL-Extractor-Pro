@@ -12,12 +12,12 @@ A powerful Chrome extension to extract URLs from the current page's HTML based o
 - [Overview](#overview)
 - [Features](#features)
 - [Installation](#installation)
-  - [From Chrome Web Store (Coming Soon)](#from-chrome-web-store-coming-soon)
-  - [From Source (for Development/Testing)](#from-source-for-developmenttesting)
+- [From Chrome Web Store (Coming Soon)](#from-chrome-web-store-coming-soon)
+- [From Source (for Development/Testing)](#from-source-for-developmenttesting)
 - [How to Use](#how-to-use)
-  - [Extract Tab](#extract-tab)
-  - [Manage Regex Tab](#manage-regex-tab)
-  - [History Tab](#history-tab)
+- [Extract Tab](#extract-tab)
+- [Manage Regex Tab](#manage-regex-tab)
+- [History Tab](#history-tab)
 - [Development](#development)
 - [Persistence](#persistence)
 - [Limitations](#limitations)
@@ -52,10 +52,10 @@ _(Once published, add the link here)_
 ### From Source (for Development/Testing)
 
 1.  **Clone or Download:** Clone this repository or download the source code as a ZIP file and extract it.
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/html-url-extractor-enhanced.git
-    cd html-url-extractor-enhanced
-    ```
+  ```bash
+  git clone https://github.com/YOUR_USERNAME/html-url-extractor-enhanced.git
+  cd html-url-extractor-enhanced
+  ```
 2.  **Open Chrome Extensions:** Open Google Chrome, type `chrome://extensions/` in the address bar, and press Enter.
 3.  **Enable Developer Mode:** In the top-right corner, toggle "Developer mode" ON.
 4.  **Load Unpacked:** Click "Load unpacked".
@@ -72,7 +72,10 @@ Click the extension icon in your toolbar to open the popup. Use the tabs at the 
 2.  Open the popup (ensure the "Extract" tab is active).
 3.  Click "Extract URLs from Current Tab".
 4.  Results appear below, grouped by the regex pattern name.
-5.  Click "Open" next to any URL to open it in a background tab.
+5.  Use the action buttons next to each URL:
+  - Click the "↗" icon to open the URL in a background tab.
+  - Click the "⎘" icon to copy the URL to your clipboard.
+6.  Use the "Open All" button to open all URLs in a group at once.
 
 ### Manage Regex Tab
 
