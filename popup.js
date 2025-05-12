@@ -668,11 +668,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const escapeHtml = (unsafe) => {
     if (typeof unsafe !== "string") return unsafe;
     return unsafe
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, """)
-      .replace(/'/g, "'");
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   };
 
   initialize(); // Start the extension logic
