@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "URL Extractor Pro",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "Extracts URLs from HTML using custom regex, manages regex patterns, and keeps a history.",
     "permissions": [
         "activeTab",
